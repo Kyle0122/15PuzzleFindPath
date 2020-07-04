@@ -38,9 +38,8 @@ class FifteenPuzzle {
     }
 
     public int getXY(int x, int y){
-        int shift = (4*x + y) *4;
-        int a = (int)((board >>> (60 - shift)) & 0xf);
-        return a;
+        int shift = (4*x + y) *4; // calc the shift of bits
+        return (int)((board >>> (60 - shift)) & 0xf);
     }
 
     public byte getHamming(FifteenPuzzle target){
@@ -144,11 +143,35 @@ class FifteenPuzzle {
         }
     };
 
+    public static void searchClosest(PriorityQueue<FifteenPuzzle> openSet, HashMap<Long, FifteenPuzzle> closeSet, FifteenPuzzle target){
+        FifteenPuzzle current = openSet.poll();
+        FifteenPuzzle[] childs = current.getChildrens();
+        int discardHammingValue = 72;
+        if(current.deep >= 40){
+            discardHammingValue = openSet.peek().hamming + (int)((160 - current.deep)*0.2); // set the value to discard a node
+        }
+        for(int i = 0; i < childs.length; i++){
+            childs[i].hamming = childs[i].getHamming(target);
+            if(childs[i].hamming < discardHammingValue){ //protect early nodes & trim bad nodes
+                openSet.add(childs[i]);
+            }
+        }
+
+        if(closeSet.containsKey(Long.valueOf(current.board))){
+            FifteenPuzzle old = closeSet.get(Long.valueOf(current.board));
+            if(current.deep < old.deep){
+                closeSet.put(Long.valueOf(current.board), current);
+            }
+        }else{
+            closeSet.put(Long.valueOf(current.board), current);
+        }
+    }
+
     public static void main(String[] args) {
         //int[][] start = {{1, 0, 2, 4},{5, 6, 3, 8},{9,10,7,11},{13,14,15,12}};
         //int[][] start = {{1, 10, 2, 4},{5, 11, 3, 7},{9, 0,6,8},{13,14,15,12}}; //11 steps
-        //int[][] start = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9,13,14,15}}; //43 steps
-        int[][] start = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses 2gigs of memory
+        int[][] start = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9,13,14,15}}; //43 steps
+        //int[][] start = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses 2gigs of memory
         //int[][] start = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}};
         FifteenPuzzle puzzleStart = new FifteenPuzzle(start);
         puzzleStart.deep = 0;
@@ -170,44 +193,20 @@ class FifteenPuzzle {
         //start loop
         int deepMax = 0;
         while(!openSet.isEmpty() && deepMax <= 100){
-            FifteenPuzzle currentState = openSet.poll();
+            FifteenPuzzle currentState = openSet.peek();
             if(currentState.deep > deepMax){
                 System.out.print("max Search deep: " + currentState.deep);
                 System.out.println("\tclose set size: " + closeSet.size() + "\topen set size: " + openSet.size());
                 deepMax = currentState.deep;
                 Runtime.getRuntime().gc();
             }
-            //System.out.println("poll out ham:" + currentState.hamming + "\n" + currentState);
             if(currentState.hamming == 0) {
                 currentState.printSolutionRecursive(puzzleStart);
                 System.out.println("Find Solution in " + currentState.deep + " steps");
                 System.out.println("###############################################################");
                 return;
             }
-            //openSet.addAll(Arrays.asList(currentState.getChildrens()));
-            //printKeySet(openSet);
-            FifteenPuzzle[] childs = currentState.getChildrens();
-            int discardHammingValue = 72;
-            if(deepMax >= 40){
-                discardHammingValue = openSet.peek().hamming + (int)((160 - deepMax)*0.2); // set the value to discard a node
-            }
-            for(int i = 0; i < childs.length; i++){
-                childs[i].hamming = childs[i].getHamming(puzzleEnd);
-                if(childs[i].hamming < discardHammingValue){ //protect early nodes & trim bad nodes
-                    openSet.add(childs[i]);
-                }
-            }
-
-            if(closeSet.containsKey(Long.valueOf(currentState.board))){
-                FifteenPuzzle old = closeSet.get(Long.valueOf(currentState.board));
-                //System.out.println("find old close node, old deep:" + old.deep);
-                //System.out.println("new close node deep:" + currentState.deep);
-                if(currentState.deep < old.deep){
-                    closeSet.put(Long.valueOf(currentState.board), currentState);
-                }
-            }else{
-                closeSet.put(Long.valueOf(currentState.board), currentState);
-            }
+            searchClosest(openSet, closeSet, puzzleEnd);
         }
     }
     /*Print all nodes in the openSet. This is for debug */
