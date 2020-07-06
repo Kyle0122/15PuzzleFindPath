@@ -161,9 +161,9 @@ class FifteenPuzzle {
             }
         }
         // set the value to discard a node, the node with deep under 30 is protected
-        int discardHammingValue = 70;
+        int maxHammingValue = 60;
         if(current.deep >= 30){
-            discardHammingValue = openSet.peek().hamming + (int)((100 - current.deep)*0.1);
+            maxHammingValue = 65-current.deep;// the maximum Hamming value is set to 65+8
         }
         for(int i = 0; i < childs.length; i++){
             childs[i].hamming = (byte) 127;
@@ -180,7 +180,7 @@ class FifteenPuzzle {
                     return true;
                 }
             }
-            if(childs[i].hamming < discardHammingValue){
+            if(childs[i].hamming < maxHammingValue){
                 openSet.add(childs[i]);
             }
         }
@@ -217,8 +217,8 @@ class FifteenPuzzle {
         //int[][] startBoard = {{1, 0, 2, 4},{5, 6, 3, 8},{9,10,7,11},{13,14,15,12}};
         //int[][] startBoard = {{1, 10, 2, 4},{5, 11, 3, 7},{9, 0, 6, 8},{13,14,15,12}}; //11 steps
         //int[][] startBoard = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9,13,14,15}}; //43 steps
-        int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses 2gigs of memory
-        //int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps, uses 5gigs of memory
+        //int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses 2gigs of memory
+        int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps, uses 5gigs of memory
         FifteenPuzzle start = new FifteenPuzzle(startBoard);
         start.deep = 0;
         int[][] endBoard = {{1, 2, 3, 4},{5, 6, 7, 8},{9,10,11,12},{13,14,15, 0}};
@@ -246,6 +246,7 @@ class FifteenPuzzle {
 
         //start loop
         int deepMax = 0;
+        int poolsize = openSet.size();
         boolean flag = false;
         while(!flag){
             FifteenPuzzle currentState = openSet.peek();
@@ -253,9 +254,13 @@ class FifteenPuzzle {
                 System.out.print("max Search deep: " + currentState.deep);
                 System.out.println("\tclose set size: " + closeSet.size() + "\topen set size: " + openSet.size());
                 deepMax = currentState.deep;
+            }
+            if((openSet.size() + closeSet.size()) - poolsize >= 100000){
+                poolsize = openSet.size() + closeSet.size();
                 Runtime.getRuntime().gc();
             }
             flag = searchClosest(openSet, closeSet, targetArray);
+            //System.out.println("\tclose set size: " + closeSet.size() + "\topen set size: " + openSet.size());
         }
     }
     /*Print all nodes in the openSet. This is for debug */
