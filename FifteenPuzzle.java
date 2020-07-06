@@ -127,25 +127,6 @@ class FifteenPuzzle {
         }
     }
 
-    @Override
-    public String toString() {
-        String ans = "";
-        for(int i = 0; i < boardLength; i++){
-            for(int j = 0; j < boardLength; j++){
-                ans += String.format("%x", getXY(i, j));
-                ans += ' ';
-            }
-            ans += '\n';
-        }
-        return ans;
-    }
-
-    static Comparator<FifteenPuzzle> comp = new Comparator<FifteenPuzzle>() {
-        public int compare(FifteenPuzzle a, FifteenPuzzle b){
-            return (a.deep*8 + a.hamming*10) - (b.deep*8 + b.hamming*10);
-        }
-    };
-
     public static boolean searchClosest(PriorityQueue<FifteenPuzzle> openSet, HashMap<Long, FifteenPuzzle> closeSet, FifteenPuzzle[] target){
         FifteenPuzzle current = openSet.poll();
         FifteenPuzzle[] childs = current.getChildrens();
@@ -163,7 +144,7 @@ class FifteenPuzzle {
         // set the value to discard a node, the node with deep under 30 is protected
         int maxHammingValue = 60;
         if(current.deep >= 30){
-            maxHammingValue = 65-current.deep;// the maximum Hamming value is set to 65+8
+            maxHammingValue = 62-current.deep;// the maximum Hamming value is set to 62+8
         }
         for(int i = 0; i < childs.length; i++){
             childs[i].hamming = (byte) 127;
@@ -217,8 +198,8 @@ class FifteenPuzzle {
         //int[][] startBoard = {{1, 0, 2, 4},{5, 6, 3, 8},{9,10,7,11},{13,14,15,12}};
         //int[][] startBoard = {{1, 10, 2, 4},{5, 11, 3, 7},{9, 0, 6, 8},{13,14,15,12}}; //11 steps
         //int[][] startBoard = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9,13,14,15}}; //43 steps
-        //int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses 2gigs of memory
-        int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps, uses 5gigs of memory
+        //int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses 1gigs of memory
+        int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps, uses 2gigs of memory
         FifteenPuzzle start = new FifteenPuzzle(startBoard);
         start.deep = 0;
         int[][] endBoard = {{1, 2, 3, 4},{5, 6, 7, 8},{9,10,11,12},{13,14,15, 0}};
@@ -263,6 +244,32 @@ class FifteenPuzzle {
             //System.out.println("\tclose set size: " + closeSet.size() + "\topen set size: " + openSet.size());
         }
     }
+    
+    static Comparator<FifteenPuzzle> comp = new Comparator<FifteenPuzzle>() {
+        public int compare(FifteenPuzzle a, FifteenPuzzle b){
+            return (a.deep*8 + a.hamming*10) - (b.deep*8 + b.hamming*10);
+        }
+    };
+
+    @Override
+    public boolean equals(Object obj) {
+        FifteenPuzzle puzz = (FifteenPuzzle)obj;
+        return this.board == puzz.board;
+    }
+    
+    @Override
+    public String toString() {
+        String ans = "";
+        for(int i = 0; i < boardLength; i++){
+            for(int j = 0; j < boardLength; j++){
+                ans += String.format("%x", getXY(i, j));
+                ans += ' ';
+            }
+            ans += '\n';
+        }
+        return ans;
+    }
+
     /*Print all nodes in the openSet. This is for debug */
     public static void printKeySet(PriorityQueue<FifteenPuzzle> openSet){
         Iterator<FifteenPuzzle> itr = openSet.iterator();
