@@ -149,9 +149,21 @@ class FifteenPuzzle {
     public static boolean searchClosest(PriorityQueue<FifteenPuzzle> openSet, HashMap<Long, FifteenPuzzle> closeSet, FifteenPuzzle[] target){
         FifteenPuzzle current = openSet.poll();
         FifteenPuzzle[] childs = current.getChildrens();
+        //if the current node is not in the close set or it has a lower deep value, add it to the close set.
+        if(!closeSet.containsKey(Long.valueOf(current.board))){
+            closeSet.put(Long.valueOf(current.board), current);
+        }else{
+            FifteenPuzzle old = closeSet.get(Long.valueOf(current.board));
+            if(current.deep < old.deep){
+                closeSet.put(Long.valueOf(current.board), current);
+            }else {
+                return false;
+            }
+        }
+        // set the value to discard a node, the node with deep under 30 is protected
         int discardHammingValue = 70;
         if(current.deep >= 30){
-            discardHammingValue = openSet.peek().hamming + (int)((100 - current.deep)*0.1); // set the value to discard a node
+            discardHammingValue = openSet.peek().hamming + (int)((100 - current.deep)*0.1);
         }
         for(int i = 0; i < childs.length; i++){
             childs[i].hamming = (byte) 127;
@@ -168,20 +180,10 @@ class FifteenPuzzle {
                     return true;
                 }
             }
-            if(childs[i].hamming < discardHammingValue){ //protect early nodes & trim bad nodes
+            if(childs[i].hamming < discardHammingValue){
                 openSet.add(childs[i]);
             }
         }
-
-        if(closeSet.containsKey(Long.valueOf(current.board))){
-            FifteenPuzzle old = closeSet.get(Long.valueOf(current.board));
-            if(current.deep < old.deep){
-                closeSet.put(Long.valueOf(current.board), current);
-            }
-        }else{
-            closeSet.put(Long.valueOf(current.board), current);
-        }
-
         return false;
     }
 
@@ -233,6 +235,7 @@ class FifteenPuzzle {
         HashMap<Long, FifteenPuzzle> closeSet = new HashMap<Long, FifteenPuzzle>();
         openSet.add(start);
         closeSet.put(Long.valueOf(start.board), start);
+        buildArray(start, end, openSet, closeSet, 3);
 
         //init target Set & target Array
         PriorityQueue<FifteenPuzzle> endOpenSet = new PriorityQueue<FifteenPuzzle>(comp);
