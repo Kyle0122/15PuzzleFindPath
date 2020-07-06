@@ -140,11 +140,6 @@ class FifteenPuzzle {
         return ans;
     }
 
-    @Override
-    public int hashCode() {
-        return Long.valueOf(this.board).hashCode();
-    }
-
     static Comparator<FifteenPuzzle> comp = new Comparator<FifteenPuzzle>() {
         public int compare(FifteenPuzzle a, FifteenPuzzle b){
             return (a.deep*8 + a.hamming*10) - (b.deep*8 + b.hamming*10);
@@ -155,8 +150,8 @@ class FifteenPuzzle {
         FifteenPuzzle current = openSet.poll();
         FifteenPuzzle[] childs = current.getChildrens();
         int discardHammingValue = 70;
-        if(current.deep >= 40){
-            discardHammingValue = openSet.peek().hamming + (int)((120 - current.deep)*0.2); // set the value to discard a node
+        if(current.deep >= 30){
+            discardHammingValue = openSet.peek().hamming + (int)((100 - current.deep)*0.1); // set the value to discard a node
         }
         for(int i = 0; i < childs.length; i++){
             childs[i].hamming = (byte) 127;
@@ -169,6 +164,7 @@ class FifteenPuzzle {
                     childs[i].printSolutionRecursive();
                     System.out.println("*");
                     target[j].printSolutionForward();
+                    System.out.println("Find Soultion in " + (childs[i].deep + target[j].deep) + " steps");
                     return true;
                 }
             }
@@ -189,32 +185,61 @@ class FifteenPuzzle {
         return false;
     }
 
+    public static FifteenPuzzle[] buildArray(FifteenPuzzle start, FifteenPuzzle end, 
+                                    PriorityQueue<FifteenPuzzle> openSet, HashMap<Long, FifteenPuzzle> closeSet, int deep){
+        int level = 0;
+        PriorityQueue<FifteenPuzzle> currentLevel = new PriorityQueue<FifteenPuzzle>(comp);
+        currentLevel.add(start);
+        while((level < deep | deep == 0) && level <= 7){
+            PriorityQueue<FifteenPuzzle> nextLevel = new PriorityQueue<FifteenPuzzle>(comp);
+            Iterator<FifteenPuzzle> itr = currentLevel.iterator();
+            while(itr.hasNext()){
+                FifteenPuzzle puzz = itr.next();
+                FifteenPuzzle[] childs = puzz.getChildrens();
+                for(int i = 0; i < childs.length; i++){
+                    childs[i].hamming = childs[i].getHamming(end);
+                    nextLevel.add(childs[i]);
+                }
+                closeSet.put(Long.valueOf(puzz.board), puzz);
+            }
+            currentLevel = nextLevel;
+            level++;
+            //System.out.println("currentLevel:" + level + "count:" + currentLevel.size());
+        }
+        openSet.addAll(currentLevel);
+        System.out.println("Build Array level " + level + ", size:" + openSet.size());
+        return openSet.toArray(new FifteenPuzzle[0]);
+    }
+
     public static void main(String[] args) {
-        //int[][] start = {{1, 0, 2, 4},{5, 6, 3, 8},{9,10,7,11},{13,14,15,12}};
-        //int[][] start = {{1, 10, 2, 4},{5, 11, 3, 7},{9, 0, 6, 8},{13,14,15,12}}; //11 steps
-        //int[][] start = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9,13,14,15}}; //43 steps
-        int[][] start = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses 2gigs of memory
-        //int[][] start = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}};
-        FifteenPuzzle puzzleStart = new FifteenPuzzle(start);
-        puzzleStart.deep = 0;
-        int[][] end = {{1, 2, 3, 4},{5, 6, 7, 8},{9,10,11,12},{13,14,15, 0}};
-        FifteenPuzzle puzzleEnd = new FifteenPuzzle(end);
-        puzzleEnd.deep = 0;
+        //int[][] startBoard = {{1, 0, 2, 4},{5, 6, 3, 8},{9,10,7,11},{13,14,15,12}};
+        //int[][] startBoard = {{1, 10, 2, 4},{5, 11, 3, 7},{9, 0, 6, 8},{13,14,15,12}}; //11 steps
+        //int[][] startBoard = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9,13,14,15}}; //43 steps
+        int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses 2gigs of memory
+        //int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps, uses 5gigs of memory
+        FifteenPuzzle start = new FifteenPuzzle(startBoard);
+        start.deep = 0;
+        int[][] endBoard = {{1, 2, 3, 4},{5, 6, 7, 8},{9,10,11,12},{13,14,15, 0}};
+        FifteenPuzzle end = new FifteenPuzzle(endBoard);
+        end.deep = 0;
 
-        puzzleStart.hamming = puzzleStart.getHamming(puzzleEnd);
-        puzzleEnd.hamming = puzzleEnd.getHamming(puzzleEnd);
-        System.out.printf("start: \n" + puzzleStart);
-        System.out.println("start ham: " + puzzleStart.hamming);
+        start.hamming = start.getHamming(end);
+        end.hamming = end.getHamming(end);
+        System.out.printf("start: \n" + start);
+        System.out.println("start ham: " + start.hamming);
 
-        //init open set and close set
+        //init open set, close set & start Array
         PriorityQueue<FifteenPuzzle> openSet = new PriorityQueue<FifteenPuzzle>(comp);
         HashMap<Long, FifteenPuzzle> closeSet = new HashMap<Long, FifteenPuzzle>();
-        closeSet.put(Long.valueOf(puzzleStart.board), puzzleStart);
-        openSet.add(puzzleStart);
+        openSet.add(start);
+        closeSet.put(Long.valueOf(start.board), start);
 
-        //init target Set
-        FifteenPuzzle[] targetSet = puzzleEnd.getChildrens();
-        //searchClosest(openSet, closeSet, targetSet);
+        //init target Set & target Array
+        PriorityQueue<FifteenPuzzle> endOpenSet = new PriorityQueue<FifteenPuzzle>(comp);
+        HashMap<Long, FifteenPuzzle> endCloseSet = new HashMap<Long, FifteenPuzzle>();
+        endOpenSet.add(end);
+        endCloseSet.put(Long.valueOf(end.board), end);
+        FifteenPuzzle[] targetArray = buildArray(end, start, endOpenSet, endCloseSet, start.hamming/6);
 
         //start loop
         int deepMax = 0;
@@ -227,7 +252,7 @@ class FifteenPuzzle {
                 deepMax = currentState.deep;
                 Runtime.getRuntime().gc();
             }
-            flag = searchClosest(openSet, closeSet, targetSet);
+            flag = searchClosest(openSet, closeSet, targetArray);
         }
     }
     /*Print all nodes in the openSet. This is for debug */
