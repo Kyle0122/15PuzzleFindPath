@@ -1,7 +1,6 @@
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.PriorityQueue;
 
 class FifteenPuzzle {
@@ -117,32 +116,28 @@ class FifteenPuzzle {
         if(this.father != this){
             this.father.printSolutionRecursive();
         }
-        System.out.println(this + "\t" + this.hamming);
+        System.out.println(this + "\t" + this.deep);
     }
 
     public void printSolutionForward(){
-        System.out.println(this + "\t" + this.hamming);
+        System.out.println(this + "\t" + this.deep);
         if(this.father != this){
             this.father.printSolutionForward();
         }
     }
 
     public static boolean searchClosest(PriorityQueue<FifteenPuzzle> openSet, HashMap<Long, FifteenPuzzle> closeSet,
-        FifteenPuzzle[] target, PriorityQueue<FifteenPuzzle> targetOpenSet){
+        FifteenPuzzle[] target, HashMap<Long, FifteenPuzzle> targetSet){
         FifteenPuzzle current = openSet.poll();
         FifteenPuzzle[] childs = current.getChildrens();
         //check if child is in the target open set:
-        for(int i = 0; i < childs.length; i++){
-            if(targetOpenSet.contains(childs[i])){
-                FifteenPuzzle puzz = childs[i];
-                puzz.printSolutionRecursive();
+        for(FifteenPuzzle puzzle : childs){
+            if(targetSet.containsKey(Long.valueOf(puzzle.board))){
+                puzzle.printSolutionRecursive();
                 System.out.println("*");
-                targetOpenSet.forEach((k)->{
-                    if(puzz.equals(k)){
-                        k.printSolutionForward();
-                        System.out.println("Find Soultion in " + (puzz.deep + k.deep) + " steps");
-                    }
-                });
+                FifteenPuzzle puzz = targetSet.get(Long.valueOf(puzzle.board));
+                puzz.printSolutionForward();
+                System.out.println("Find Soultion in " + (puzzle.deep + puzz.deep) + " steps");
                 return true;
             }
         }
@@ -160,12 +155,12 @@ class FifteenPuzzle {
         // set the value to discard a node, the node with deep under 30 is protected
         int maxHammingValue = 60;
         if(current.deep >= 30){
-            maxHammingValue = 62-current.deep;// the maximum Hamming value is set to 62+8
+            //maxHammingValue = 72 - current.deep;// the maximum level is set to
+            maxHammingValue = 45;
         }
-        for(int i = 0; i < childs.length; i++){
-            childs[i].hamming = (byte) 127;
-            for(int j = 0;j < target.length; j++){
-                byte a = childs[i].getHamming(target[j]);
+        for(int i = 0; i < childs.length; i++) {
+            for(FifteenPuzzle puzz : target) {
+                byte a = childs[i].getHamming(puzz);
                 if(a < childs[i].hamming){
                     childs[i].hamming = a;
                 }
@@ -178,37 +173,42 @@ class FifteenPuzzle {
     }
 
     public static FifteenPuzzle[] buildArray(FifteenPuzzle start, FifteenPuzzle end, 
-        PriorityQueue<FifteenPuzzle> openSet, HashMap<Long, FifteenPuzzle> closeSet, int deep){
+        PriorityQueue<FifteenPuzzle> openSet, HashMap<Long, FifteenPuzzle> closeSet, int deep, int sampleDeep){
         int level = 0;
+        FifteenPuzzle[] sample = new FifteenPuzzle[0];
         PriorityQueue<FifteenPuzzle> currentLevel = new PriorityQueue<FifteenPuzzle>(comp);
         currentLevel.add(start);
-        while((level < deep | deep == 0) && level <= 7){
+        if(deep <= 0){deep = 1;}
+        while(level < deep) {
             PriorityQueue<FifteenPuzzle> nextLevel = new PriorityQueue<FifteenPuzzle>(comp);
-            Iterator<FifteenPuzzle> itr = currentLevel.iterator();
-            while(itr.hasNext()){
-                FifteenPuzzle puzz = itr.next();
+            for(FifteenPuzzle puzz : currentLevel){
                 FifteenPuzzle[] childs = puzz.getChildrens();
                 for(int i = 0; i < childs.length; i++){
                     childs[i].hamming = childs[i].getHamming(end);
-                    nextLevel.add(childs[i]);
+                    if(!closeSet.containsKey(Long.valueOf(childs[i].board))){
+                        nextLevel.add(childs[i]);
+                    }
                 }
                 closeSet.put(Long.valueOf(puzz.board), puzz);
             }
             currentLevel = nextLevel;
+            if(level == sampleDeep){
+                sample = currentLevel.toArray(sample);
+            }
             level++;
-            //System.out.println("currentLevel:" + level + "count:" + currentLevel.size());
         }
         openSet.addAll(currentLevel);
-        System.out.println("Build Array level " + level + ", size:" + openSet.size());
-        return openSet.toArray(new FifteenPuzzle[0]);
+        System.out.println("Build Array level " + level + ", size:" + openSet.size() + "   " + openSet.peek().deep);
+        return sample;
     }
 
     public static void main(String[] args) {
         //int[][] startBoard = {{1, 0, 2, 4},{5, 6, 3, 8},{9,10,7,11},{13,14,15,12}};
         //int[][] startBoard = {{1, 10, 2, 4},{5, 11, 3, 7},{9, 0, 6, 8},{13,14,15,12}}; //11 steps
         //int[][] startBoard = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9,13,14,15}}; //43 steps
-        int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses 1gigs of memory
-        //int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps, uses 2gigs of memory
+        //int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses .5gigs of memory
+        //int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps, uses 1.8gigs of memory
+        int[][] startBoard = {{11, 15, 9, 12},{14, 10, 13, 8},{6, 2, 4, 7},{3, 5, 0, 1}}; //67 steps
         FifteenPuzzle start = new FifteenPuzzle(startBoard);
         start.deep = 0;
         int[][] endBoard = {{1, 2, 3, 4},{5, 6, 7, 8},{9,10,11,12},{13,14,15, 0}};
@@ -219,20 +219,18 @@ class FifteenPuzzle {
         end.hamming = end.getHamming(start);
         System.out.printf("start: \n" + start);
         System.out.println("start ham: " + start.hamming);
+        long sysDate = System.currentTimeMillis();
 
         //init open set, close set & start Array
         PriorityQueue<FifteenPuzzle> openSet = new PriorityQueue<FifteenPuzzle>(comp);
         HashMap<Long, FifteenPuzzle> closeSet = new HashMap<Long, FifteenPuzzle>();
-        openSet.add(start);
-        closeSet.put(Long.valueOf(start.board), start);
-        FifteenPuzzle[] openArray = buildArray(start, end, openSet, closeSet, start.hamming/6);
+        buildArray(start, end, openSet, closeSet, start.hamming/6, 0);
 
         //init target Set & target Array
         PriorityQueue<FifteenPuzzle> endOpenSet = new PriorityQueue<FifteenPuzzle>(comp);
         HashMap<Long, FifteenPuzzle> endCloseSet = new HashMap<Long, FifteenPuzzle>();
-        endOpenSet.add(end);
-        endCloseSet.put(Long.valueOf(end.board), end);
-        FifteenPuzzle[] endArray = buildArray(end, start, endOpenSet, endCloseSet, start.hamming/6);
+        FifteenPuzzle[] endArray = buildArray(end, start, endOpenSet, endCloseSet, start.hamming/5 + 1, Math.min(3, start.hamming/5));
+        System.out.println("sample length   " + endArray.length);
 
         //start loop
         int deepMax = 0;
@@ -240,23 +238,24 @@ class FifteenPuzzle {
         boolean flag = false;
         while(!flag){
             FifteenPuzzle currentState = openSet.peek();
-            if(currentState.deep > deepMax){
+            if(currentState.deep > deepMax) {
                 System.out.print("max Search deep: " + currentState.deep);
                 System.out.println("\tclose set size: " + closeSet.size() + "\topen set size: " + openSet.size());
                 deepMax = currentState.deep;
             }
-            if((openSet.size() + closeSet.size()) - poolsize >= 100000){
+            if((openSet.size() + closeSet.size()) - poolsize >= 200000){
                 poolsize = openSet.size() + closeSet.size();
                 Runtime.getRuntime().gc();
             }
-            flag = searchClosest(openSet, closeSet, endArray, endOpenSet);
-            //System.out.println("\tclose set size: " + closeSet.size() + "\topen set size: " + openSet.size());
+            flag = searchClosest(openSet, closeSet, endArray, endCloseSet);
         }
+        sysDate = System.currentTimeMillis() - sysDate;
+        System.out.println("Used time: " + sysDate*0.001 + "s");
     }
     
     static Comparator<FifteenPuzzle> comp = new Comparator<FifteenPuzzle>() {
         public int compare(FifteenPuzzle a, FifteenPuzzle b){
-            return (a.deep*8 + a.hamming*10) - (b.deep*8 + b.hamming*10);
+            return (a.deep*9 + a.hamming*11) - (b.deep*9 + b.hamming*11);
         }
     };
 
