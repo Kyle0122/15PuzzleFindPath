@@ -2,3 +2,4 @@ a.out
 FifteenPuzzle.class
 FifteenPuzzle$1.class
 _pycache_/
+.pytest_cache/
