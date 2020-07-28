@@ -75,7 +75,7 @@ class FifteenPuzzle {
     }
 
     public FifteenPuzzle[] getChildrens(){
-        FifteenPuzzle[] childs = new FifteenPuzzle[4];
+        var childs = new FifteenPuzzle[4];
         int index = 0;
         int[][] newboard = new int[4][4];
         for(int i = 0; i < boardLength; i++){
@@ -128,8 +128,8 @@ class FifteenPuzzle {
 
     public static boolean searchClosest(PriorityQueue<FifteenPuzzle> openSet, HashMap<Long, FifteenPuzzle> closeSet,
         FifteenPuzzle[] target, HashMap<Long, FifteenPuzzle> targetSet){
-        FifteenPuzzle current = openSet.poll();
-        FifteenPuzzle[] childs = current.getChildrens();
+        var current = openSet.poll();
+        var childs = current.getChildrens();
         //check if child is in the target open set:
         for(FifteenPuzzle puzzle : childs){
             if(targetSet.containsKey(Long.valueOf(puzzle.board))){
@@ -175,7 +175,7 @@ class FifteenPuzzle {
     public static FifteenPuzzle[] buildArray(FifteenPuzzle start, FifteenPuzzle end, 
         PriorityQueue<FifteenPuzzle> openSet, HashMap<Long, FifteenPuzzle> closeSet, int deep, int sampleDeep){
         int level = 0;
-        FifteenPuzzle[] sample = new FifteenPuzzle[0];
+        var sample = new FifteenPuzzle[0];
         PriorityQueue<FifteenPuzzle> currentLevel = new PriorityQueue<FifteenPuzzle>(comp);
         currentLevel.add(start);
         if(deep <= 0){deep = 1;}
@@ -206,13 +206,13 @@ class FifteenPuzzle {
         //int[][] startBoard = {{1, 0, 2, 4},{5, 6, 3, 8},{9,10,7,11},{13,14,15,12}};
         //int[][] startBoard = {{1, 10, 2, 4},{5, 11, 3, 7},{9, 0, 6, 8},{13,14,15,12}}; //11 steps
         //int[][] startBoard = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9,13,14,15}}; //43 steps
-        int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses .5gigs of memory
-        //int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps, uses 1.8gigs of memory
-        //int[][] startBoard = {{2, 12, 9, 1},{5, 7, 0, 6},{14, 3, 4, 10},{13, 8, 11, 15}}; //67 steps
-        FifteenPuzzle start = new FifteenPuzzle(startBoard);
+        //int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps
+        int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps
+        //int[][] startBoard = {{2, 12, 9, 1},{5, 7, 0, 6},{14, 3, 4, 10},{13, 8, 11, 15}}; //45 steps
+        var start = new FifteenPuzzle(startBoard);
         start.deep = 0;
         int[][] endBoard = {{1, 2, 3, 4},{5, 6, 7, 8},{9,10,11,12},{13,14,15, 0}};
-        FifteenPuzzle end = new FifteenPuzzle(endBoard);
+        var end = new FifteenPuzzle(endBoard);
         end.deep = 0;
 
         start.hamming = start.getHamming(end);
@@ -222,20 +222,20 @@ class FifteenPuzzle {
         long sysDate = System.currentTimeMillis();
 
         //init open set, close set & start Array
-        PriorityQueue<FifteenPuzzle> openSet = new PriorityQueue<FifteenPuzzle>(comp);
-        HashMap<Long, FifteenPuzzle> closeSet = new HashMap<Long, FifteenPuzzle>();
+        var openSet = new PriorityQueue<FifteenPuzzle>(comp);
+        var closeSet = new HashMap<Long, FifteenPuzzle>();
         buildArray(start, end, openSet, closeSet, start.hamming/6, 0);
 
         //init target Set & target Array
-        PriorityQueue<FifteenPuzzle> endOpenSet = new PriorityQueue<FifteenPuzzle>(comp);
-        HashMap<Long, FifteenPuzzle> endCloseSet = new HashMap<Long, FifteenPuzzle>();
-        FifteenPuzzle[] endArray = buildArray(end, start, endOpenSet, endCloseSet, start.hamming/5 + 1, Math.min(3, start.hamming/5));
+        var endOpenSet = new PriorityQueue<FifteenPuzzle>(comp);
+        var endCloseSet = new HashMap<Long, FifteenPuzzle>();
+        var endArray = buildArray(end, start, endOpenSet, endCloseSet, start.hamming/5 + 1, Math.min(3, start.hamming/5));
         System.out.println("sample length   " + endArray.length);
 
         //start loop
         int deepMax = 0;
         int poolsize = openSet.size();
-        boolean flag = false;
+        var flag = false;
         while(!flag){
             FifteenPuzzle currentState = openSet.peek();
             if(currentState.deep > deepMax) {
@@ -245,7 +245,7 @@ class FifteenPuzzle {
             }
             if((openSet.size() + closeSet.size()) - poolsize >= 200000){
                 poolsize = openSet.size() + closeSet.size();
-                Runtime.getRuntime().gc();
+                //Runtime.getRuntime().gc();
             }
             flag = searchClosest(openSet, closeSet, endArray, endCloseSet);
         }
@@ -261,7 +261,7 @@ class FifteenPuzzle {
 
     @Override
     public boolean equals(Object obj) {
-        FifteenPuzzle puzz = (FifteenPuzzle)obj;
+        var puzz = (FifteenPuzzle)obj;
         return this.board == puzz.board;
     }
     
@@ -276,5 +276,10 @@ class FifteenPuzzle {
             ans += '\n';
         }
         return ans;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.valueOf(board).hashCode();
     }
 }

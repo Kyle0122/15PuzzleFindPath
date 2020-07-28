@@ -36,14 +36,14 @@ class Position: # For PriorityQueue, to make "<" do the right thing.
         self.loss = loss(position)
         self.start_distance = start_distance
     def __lt__(self, other):
-        return self.start_distance < other.start_distance
+        return self.loss + self.start_distance*0.818 < other.loss + other.start_distance*0.818
     def __str__(self):
         s = ((N*'{:3}').format(*[(j+1)%(N*N) for j in self.position[i:]]) for i in range(0, N*N, N))
         return '\n'.join(s)
 
-start = [1, 16, 2, 4, 5, 6, 3, 8, 9,10,7,11, 13,14,15,12]
+start = [1, 10, 2, 4, 5, 11, 3, 7, 9, 16, 6, 8, 13, 14, 15, 12]
 print(start)
-for i, val in enumerate(start): 
+for i, val in enumerate(start):
     start[i] -= 1
 start = tuple(start)
 p = Position(start, 0)
@@ -53,10 +53,12 @@ candidates.put(p)
 visited = set([p]) # Tuples rather than lists so they go into a set.
 came_from = {p.position: None}
 
+maxdeep = 0
 while p.position != tuple(range(N*N)):
     p = candidates.get()
-    #print(p)
-    #print("\n")
+    if p.start_distance > maxdeep:
+        maxdeep = p.start_distance
+        print("max deep: {}\tsize: {}".format(maxdeep, candidates.qsize()))
     for k in moves(p.position):
         if k not in visited:
             candidates.put(Position(k,p.start_distance+1))
