@@ -206,9 +206,9 @@ class FifteenPuzzle {
         //int[][] startBoard = {{1, 0, 2, 4},{5, 6, 3, 8},{9,10,7,11},{13,14,15,12}};
         //int[][] startBoard = {{1, 10, 2, 4},{5, 11, 3, 7},{9, 0, 6, 8},{13,14,15,12}}; //11 steps
         //int[][] startBoard = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9,13,14,15}}; //43 steps
-        //int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses .5gigs of memory
+        int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps, uses .5gigs of memory
         //int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps, uses 1.8gigs of memory
-        int[][] startBoard = {{11, 15, 9, 12},{14, 10, 13, 8},{6, 2, 4, 7},{3, 5, 0, 1}}; //67 steps
+        //int[][] startBoard = {{2, 12, 9, 1},{5, 7, 0, 6},{14, 3, 4, 10},{13, 8, 11, 15}}; //67 steps
         FifteenPuzzle start = new FifteenPuzzle(startBoard);
         start.deep = 0;
         int[][] endBoard = {{1, 2, 3, 4},{5, 6, 7, 8},{9,10,11,12},{13,14,15, 0}};
