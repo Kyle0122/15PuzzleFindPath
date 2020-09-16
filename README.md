@@ -1,5 +1,5 @@
 # 15PuzzleShortPath
-# Run: (openjdk11)
+# Run: (openjdk14)
 java -XX:+UnlockExperimentalVMOptions -Xms8g -XX:+AlwaysPreTouch FifteenPuzzle.java
 Use more ram if your starting puzzle is too hard to solve.
 # About finding shorter path
