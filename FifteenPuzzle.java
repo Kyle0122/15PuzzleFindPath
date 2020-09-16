@@ -155,8 +155,8 @@ class FifteenPuzzle {
         // set the value to discard a node, the node with deep under 30 is protected
         int maxHammingValue = 60;
         if(current.deep >= 30){
-            //maxHammingValue = 72 - current.deep;// the maximum level is set to
-            maxHammingValue = 45;
+            maxHammingValue = 72 - current.deep;// the maximum level is set to
+            //maxHammingValue = 45;
         }
         for(int i = 0; i < childs.length; i++) {
             for(FifteenPuzzle puzz : target) {
@@ -208,7 +208,7 @@ class FifteenPuzzle {
         //int[][] startBoard = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9,13,14,15}}; //43 steps
         //int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2,6,13,5},{3,7,4,1}}; //66 steps
         int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps
-        //int[][] startBoard = {{2, 12, 9, 1},{5, 7, 0, 6},{14, 3, 4, 10},{13, 8, 11, 15}}; //45 steps
+        //int[][] startBoard = {{11, 15, 8, 12},{14, 10, 13, 9},{2, 7, 4, 5},{3, 6, 1, 0}}; //64 steps
         var start = new FifteenPuzzle(startBoard);
         start.deep = 0;
         int[][] endBoard = {{1, 2, 3, 4},{5, 6, 7, 8},{9,10,11,12},{13,14,15, 0}};
@@ -224,7 +224,7 @@ class FifteenPuzzle {
         //init open set, close set & start Array
         var openSet = new PriorityQueue<FifteenPuzzle>(comp);
         var closeSet = new HashMap<Long, FifteenPuzzle>();
-        buildArray(start, end, openSet, closeSet, start.hamming/6, 0);
+        buildArray(start, end, openSet, closeSet, start.hamming/4, 0);
 
         //init target Set & target Array
         var endOpenSet = new PriorityQueue<FifteenPuzzle>(comp);
@@ -255,7 +255,7 @@ class FifteenPuzzle {
     
     static Comparator<FifteenPuzzle> comp = new Comparator<FifteenPuzzle>() {
         public int compare(FifteenPuzzle a, FifteenPuzzle b){
-            return (a.deep*9 + a.hamming*11) - (b.deep*9 + b.hamming*11);
+            return (a.deep*9 + a.hamming*10) - (b.deep*9 + b.hamming*10);
         }
     };
 
