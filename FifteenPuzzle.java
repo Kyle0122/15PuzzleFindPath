@@ -8,7 +8,7 @@ class FifteenPuzzle {
     long board;
     byte x,y;
     byte hamming;
-    byte deep;
+    byte depth;
     FifteenPuzzle father;
 
     FifteenPuzzle(int[][] data){
@@ -87,25 +87,25 @@ class FifteenPuzzle {
         if(x!=0 && father.x!=x-1){
             childs[index] = new FifteenPuzzle(newboard, this);
             childs[index].moveZero(-1,0);
-            childs[index].deep = (byte) (this.deep + 1);
+            childs[index].depth = (byte) (this.depth + 1);
             index++;
         }
         if(x!=boardLength-1 && father.x!=x+1){
             childs[index] = new FifteenPuzzle(newboard, this);
             childs[index].moveZero(1,0);
-            childs[index].deep = (byte) (this.deep + 1);
+            childs[index].depth = (byte) (this.depth + 1);
             index++;
         }
         if(y!=0 && father.y!=y-1){
             childs[index] = new FifteenPuzzle(newboard, this);
             childs[index].moveZero(0,-1);
-            childs[index].deep = (byte) (this.deep + 1);
+            childs[index].depth = (byte) (this.depth + 1);
             index++;
         }
         if(y!=boardLength-1 && father.y!=y+1){
             childs[index] = new FifteenPuzzle(newboard, this);
             childs[index].moveZero(0,1);
-            childs[index].deep = (byte) (this.deep + 1);
+            childs[index].depth = (byte) (this.depth + 1);
             index++;
         }
 
@@ -116,11 +116,11 @@ class FifteenPuzzle {
         if(this.father != this){
             this.father.printSolutionRecursive();
         }
-        System.out.println(this + "\t" + this.deep);
+        System.out.println(this + "\t" + this.depth);
     }
 
     public void printSolutionForward(){
-        System.out.println(this + "\t" + this.deep);
+        System.out.println(this + "\t" + this.depth);
         if(this.father != this){
             this.father.printSolutionForward();
         }
@@ -137,7 +137,7 @@ class FifteenPuzzle {
                 System.out.println("*");
                 FifteenPuzzle puzz = targetSet.get(Long.valueOf(puzzle.board));
                 puzz.printSolutionForward();
-                System.out.println("Find Soultion in " + (puzzle.deep + puzz.deep) + " steps");
+                System.out.println("Find Soultion in " + (puzzle.depth + puzz.depth) + " steps");
                 return true;
             }
         }
@@ -146,7 +146,7 @@ class FifteenPuzzle {
             closeSet.put(Long.valueOf(current.board), current);
         }else{
             FifteenPuzzle old = closeSet.get(Long.valueOf(current.board));
-            if(current.deep < old.deep){
+            if(current.depth < old.depth){
                 closeSet.put(Long.valueOf(current.board), current);
             }else {
                 return false;
@@ -154,8 +154,8 @@ class FifteenPuzzle {
         }
         // set the value to discard a node, the node with deep under 30 is protected
         int maxHammingValue = 60;
-        if(current.deep >= 30){
-            maxHammingValue = 72 - current.deep;// the maximum level is set to
+        if(current.depth >= 30){
+            maxHammingValue = 72 - current.depth;// the maximum level is set to
             //maxHammingValue = 45;
         }
         for(int i = 0; i < childs.length; i++) {
@@ -198,7 +198,7 @@ class FifteenPuzzle {
             level++;
         }
         openSet.addAll(currentLevel);
-        System.out.println("Build Array level " + level + ", size:" + openSet.size() + "   " + openSet.peek().deep);
+        System.out.println("Build Array level " + level + ", size:" + openSet.size() + "   " + openSet.peek().depth);
         return sample;
     }
 
@@ -210,10 +210,10 @@ class FifteenPuzzle {
         int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3,7,4,1}}; //69 steps
         //int[][] startBoard = {{11, 15, 8, 12},{14, 10, 13, 9},{2, 7, 4, 5},{3, 6, 1, 0}}; //64 steps
         var start = new FifteenPuzzle(startBoard);
-        start.deep = 0;
+        start.depth = 0;
         int[][] endBoard = {{1, 2, 3, 4},{5, 6, 7, 8},{9,10,11,12},{13,14,15, 0}};
         var end = new FifteenPuzzle(endBoard);
-        end.deep = 0;
+        end.depth = 0;
 
         start.hamming = start.getHamming(end);
         end.hamming = end.getHamming(start);
@@ -238,10 +238,10 @@ class FifteenPuzzle {
         var flag = false;
         while(!flag){
             FifteenPuzzle currentState = openSet.peek();
-            if(currentState.deep > deepMax) {
-                System.out.print("max Search deep: " + currentState.deep);
+            if(currentState.depth > deepMax) {
+                System.out.print("max Search deep: " + currentState.depth);
                 System.out.println("\tclose set size: " + closeSet.size() + "\topen set size: " + openSet.size());
-                deepMax = currentState.deep;
+                deepMax = currentState.depth;
             }
             if((openSet.size() + closeSet.size()) - poolsize >= 200000){
                 poolsize = openSet.size() + closeSet.size();
@@ -255,7 +255,7 @@ class FifteenPuzzle {
     
     static Comparator<FifteenPuzzle> comp = new Comparator<FifteenPuzzle>() {
         public int compare(FifteenPuzzle a, FifteenPuzzle b){
-            return (a.deep*9 + a.hamming*10) - (b.deep*9 + b.hamming*10);
+            return (a.depth*9 + a.hamming*10) - (b.depth*9 + b.hamming*10);
         }
     };
 
