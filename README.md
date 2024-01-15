@@ -1,4 +1,4 @@
-# 15PuzzleShortPath
+# 15PuzzleFindPath
 
 This program uses A* search and Manhattan distance as Heuristic Function. It should return the shortest path with any 15 puzzle under 67 steps(under 20mins).
 The code is originally write in java, later translated to kotlin. The kotlin version runs about 15% faster.
