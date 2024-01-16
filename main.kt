@@ -1,5 +1,6 @@
 import java.util.PriorityQueue
 import java.util.HashMap
+import java.io.File
 
 fun searchClosest(
     openSet: PriorityQueue<FifteenPuzzle>,
@@ -89,61 +90,64 @@ fun buildArray(
 }
 
 fun main(args: Array<String>) {
-    /*val startBoard = arrayOf(
-        intArrayOf(14, 10, 2, 1),
-        intArrayOf(13, 9, 8, 11),
-        intArrayOf(7, 3, 6, 12),
-        intArrayOf(15, 5, 4, 0)
-    )*/
-    
-    /*val startBoard = arrayOf(
-        intArrayOf(14, 10, 2, 1),
-        intArrayOf(13, 9, 8, 0),
-        intArrayOf(7, 3, 6, 11),
-        intArrayOf(15, 5, 4, 12)
-    )*/
-    
-    val startBoard = arrayOf(
-        intArrayOf(14, 13, 15, 7),
-        intArrayOf(11, 12, 9, 5),
-        intArrayOf(6, 0, 2, 1),
-        intArrayOf(4, 8, 10, 3)
-    )
-    
-    val start = FifteenPuzzle(startBoard)
+    // Check if the correct number of arguments is provided
+    if (args.size != 2) {
+        println("Usage: java -jar -Xms8g mainkt.jar <input_file> <target_file>")
+        return
+    }
 
-    val endBoard = arrayOf(
-        intArrayOf(0, 1, 2, 3),
-        intArrayOf(4, 5, 6, 7),
-        intArrayOf(8, 9, 10, 11),
-        intArrayOf(12, 13, 14, 15)
-    )
+    // Read the input file
+    val inputFile = File(args[0])
+    val inputLines = inputFile.useLines { it.toList() }
+
+    // Initialize the starting puzzle board
+    val startBoard = inputLines
+        .filterNot { it.startsWith("#") || it.isBlank() }
+        .map { line -> line.trim().split("\\s+".toRegex()).map { it.toInt() }.toIntArray() }
+        .toTypedArray()
+    val start = FifteenPuzzle(startBoard)
+    
+    // Read the target file
+    val targetFile = File(args[1])
+    val targetLines = targetFile.useLines { it.toList() }
+    
+    // Initialize the target puzzle board
+    val endBoard = targetLines
+        .filterNot { it.startsWith("#") || it.isBlank() }
+        .map { line -> line.trim().split("\\s+".toRegex()).map { it.toInt() }.toIntArray() }
+        .toTypedArray()
     val end = FifteenPuzzle(endBoard)
+    
     start.manhattan = start.getManhattan(end)
     end.manhattan = end.getManhattan(start)
-    println("start: \n$start")
+    println("start: \n${start}")
+    println("start manhattan: " + start.manhattan)
     println("start parity: " + start.getParity())
-    println("start ham: " + start.manhattan)
+    println("end parity: " + end.getParity())
+    
+    // parity check
+    /*val parityDifference = start.getParity() - end.getParity()
+    if (parityDifference % 2 == 0) {
+        println("parity check passed.")
+    } else {
+        println("parity check shows unsolvable, exiting.")
+        return
+    }*/
+    
+    val endOpenSet = PriorityQueue<FifteenPuzzle>(comp)
+    val endCloseSet = HashMap<ULong, FifteenPuzzle>()
+    val endArray = buildArray(end, start, endOpenSet, endCloseSet,
+            start.manhattan / 5, start.manhattan / 5)
+    println("Build Array level ${endOpenSet.peek().depth}, size: ${endOpenSet.size}")
+    println("sample length   ${endArray.size}")
+    
+    // record starting time
     val sysDate = System.currentTimeMillis()
 
     val openSet = PriorityQueue<FifteenPuzzle>(comp)
     val closeSet = HashMap<ULong, FifteenPuzzle>()
-    buildArray(start, end, openSet, closeSet, start.manhattan / 4, 0)
+    buildArray(start, end, openSet, closeSet, start.manhattan / 5, 0)
     println("Build Array level ${openSet.peek().depth}, size: ${openSet.size}")
-
-    val endOpenSet = PriorityQueue<FifteenPuzzle>(comp)
-    val endCloseSet = HashMap<ULong, FifteenPuzzle>()
-    val endArray = buildArray(
-        end,
-        start,
-        endOpenSet,
-        endCloseSet,
-        start.manhattan / 4,
-        Math.max(0, start.manhattan / 4 - 3)
-    )
-    println("Build Array level ${endOpenSet.peek().depth}, size: ${endOpenSet.size}")
-    println("sample length   ${endArray.size}")
-
 
     var depth_Max: Byte = 0
     var ResultArray: Array<FifteenPuzzle>? = null
@@ -163,5 +167,4 @@ fun main(args: Array<String>) {
     ResultArray[1].parent.printSolutionForward()
     println("Used time: ${timelaps * 0.001}s")
     println("Total Nodes: ${openSet.size + closeSet.size + endCloseSet.size + endOpenSet.size}")
-
 }

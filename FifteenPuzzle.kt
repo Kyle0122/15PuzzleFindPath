@@ -6,47 +6,59 @@ class FifteenPuzzle {
     
     var board: ULong = 0UL
     var parent: FifteenPuzzle = this
-    var x: Byte = 0
-    var y: Byte = 0
+    var x: Byte = 1
+    var y: Byte = 1
     var manhattan: Byte = 127.toByte()
     var depth: Byte = 0
 
-    constructor(data: Array<IntArray>) {
+    constructor(board: Array<IntArray>) {
         for (i in 0 until BOARDLENGTH) {
             for (j in 0 until BOARDLENGTH) {
-                if (data[i][j] == 0) {
+                if (board[i][j] == 0 || board[i][j] == 16) {
                     x = i.toByte()
                     y = j.toByte()
                 } else {
-                    setval(i, j, data[i][j].toByte())
+                    setval(i, j, board[i][j].toByte())
                 }
             }
         }
     }
 
-    constructor(data: Array<IntArray>, parent: FifteenPuzzle) : this(data) {
+    constructor(board: Array<IntArray>, parent: FifteenPuzzle) : this(board) {
         this.parent = parent
     }
-    
-    constructor(data: Array<IntArray>, depth: Int) : this(data) {
+
+    constructor(board: Array<IntArray>, depth: Int) : this(board) {
         this.depth = depth.toByte()
+    }
+    
+    // Copy constructor
+    constructor(original: FifteenPuzzle) {
+        this.board = original.board
+        this.parent = original.parent
+        this.x = original.x
+        this.y = original.y
+        this.manhattan = original.manhattan
+        this.depth = original.depth
     }
 
     fun setval(x: Int, y: Int, value: Byte) {
-        val shift = (4 * x + y) * 4
-        val mask = (value.toULong() shl (60 - shift))
-        board = board and ((0xfUL shl (60 - shift)).inv())
-        board = board or mask
+        val shift = 60 - (4 * x + y) * 4
+        // Perform the left shift
+        val shiftedValue: ULong = (value.toULong() and 0xFUL) shl shift
+        // Clear the bits at the specified position in the board
+        val clearedBoard: ULong = board and (0xFFFFFFFFFFFFFFFFUL xor (0xFUL shl shift))
+        board = clearedBoard or shiftedValue
     }
 
     fun getval(x: Int, y: Int): Int {
-        val shift = (4 * x + y) * 4
-        return ((board shr (60 - shift)) and 0xfUL).toInt()
+        val shift = 60 - (4 * x + y) * 4
+        return ((board shr shift) and 0xfUL).toInt()
     }
     
-    inline fun FifteenPuzzle.getx(): Int = this.x.toInt()
+    fun getx(): Int = this.x.toInt()
 	
-    inline fun FifteenPuzzle.gety(): Int = this.y.toInt()
+    fun gety(): Int = this.y.toInt()
 
     fun getManhattan(target: FifteenPuzzle): Byte {
         var manhattan = 0
@@ -84,51 +96,47 @@ class FifteenPuzzle {
         return parity
     }
 
-    private fun moveZero(rx: Int, ry: Int) {
-        var rxNew = rx + x
-        var ryNew = ry + y
+    private fun moveZero(dx: Int, dy: Int) {
+        var xNew = getx() + dx
+        var yNew = gety() + dy
 
-        setval(x.toInt(), y.toInt(), getval(rxNew, ryNew).toByte())
-        setval(rxNew, ryNew, 0)
+        setval(x.toInt(), y.toInt(), getval(xNew, yNew).toByte())
+        setval(xNew, yNew, 0)
 
-        x = rxNew.toByte()
-        y = ryNew.toByte()
+        x = xNew.toByte()
+        y = yNew.toByte()
     }
 
     fun getChildren(): Array<FifteenPuzzle> {
-        val children = arrayOfNulls<FifteenPuzzle>(4)
+        val children: Array<FifteenPuzzle> = 
+                arrayOf(FifteenPuzzle(this), FifteenPuzzle(this), FifteenPuzzle(this), FifteenPuzzle(this))
         var index = 0
-        val newboard = Array(4) { IntArray(4) }
-        for (i in 0 until BOARDLENGTH) {
-            for (j in 0 until BOARDLENGTH) {
-                newboard[i][j] = getval(i, j)
-            }
-        }
+        
         if (getx() != 0 && parent.getx() != x - 1) {
-            children[index] = FifteenPuzzle(newboard, this)
-            children[index]?.moveZero(-1, 0)
-            children[index]?.depth = (this.depth + 1).toByte()
+            children[index].parent = this
+            children[index].moveZero(-1, 0)
+            children[index].depth = (this.depth + 1).toByte()
             index++
         }
         if (getx() != BOARDLENGTH - 1 && parent.getx() != x + 1) {
-            children[index] = FifteenPuzzle(newboard, this)
-            children[index]?.moveZero(1, 0)
-            children[index]?.depth = (this.depth + 1).toByte()
+            children[index].parent = this
+            children[index].moveZero(1, 0)
+            children[index].depth = (this.depth + 1).toByte()
             index++
         }
         if (gety() != 0 && parent.gety() != y - 1) {
-            children[index] = FifteenPuzzle(newboard, this)
-            children[index]?.moveZero(0, -1)
-            children[index]?.depth = (this.depth + 1).toByte()
+            children[index].parent = this
+            children[index].moveZero(0, -1)
+            children[index].depth = (this.depth + 1).toByte()
             index++
         }
         if (gety() != BOARDLENGTH - 1 && parent.gety() != y + 1) {
-            children[index] = FifteenPuzzle(newboard, this)
-            children[index]?.moveZero(0, 1)
-            children[index]?.depth = (this.depth + 1).toByte()
+            children[index].parent = this
+            children[index].moveZero(0, 1)
+            children[index].depth = (this.depth + 1).toByte()
             index++
         }
-        return (children.copyOf(index) as Array<FifteenPuzzle>)
+        return children.slice(0 until index).toTypedArray()
     }
 
     fun printSolutionRecursive(forward: Boolean): String {

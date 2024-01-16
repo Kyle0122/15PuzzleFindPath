@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class main {
-	
+
     public static boolean searchClosest(PriorityQueue<FifteenPuzzle> openSet, HashMap<Long, FifteenPuzzle> closeSet,
             int maxdepth, FifteenPuzzle[] target, HashMap<Long, FifteenPuzzle> targetSet,
             FifteenPuzzle[] ResultArray) {
@@ -12,8 +12,8 @@ public class main {
         var children = current.getChildren();
 
         //check if any child is in the target open set:
-        for(FifteenPuzzle puzzle : children){
-            if(targetSet.containsKey(puzzle.board)){
+        for(FifteenPuzzle puzzle : children) {
+            if(targetSet.containsKey(puzzle.board)) {
                 //puzzle.printSolutionRecursive();
                 FifteenPuzzle target_puzz = targetSet.get(puzzle.board);
                 //target_puzz.parent.printSolutionForward();
@@ -26,13 +26,13 @@ public class main {
         }
 
         //if the current node is not in the close set or it has a lower depth value, add it to the close set.
-        if(!closeSet.containsKey(current.board)){
+        if(!closeSet.containsKey(current.board)) {
             closeSet.put(current.board, current);
-        }else{
+        } else {
             FifteenPuzzle old = closeSet.get(current.board);
-            if(current.depth < old.depth){
+            if(current.depth < old.depth) {
                 closeSet.put(current.board, current);
-            }else {
+            } else {
                 return false;
             }
         }
@@ -43,7 +43,7 @@ public class main {
         for(int i = 0; i < children.length; i++) {
             for(FifteenPuzzle puzz : target) {
                 byte a = children[i].getManhattan(puzz);
-                if(a < children[i].manhattan){
+                if(a < children[i].manhattan) {
                     children[i].manhattan = a;
                 }
             }
@@ -61,7 +61,7 @@ public class main {
         //}
         return false;
     }
-	
+
     static Comparator<FifteenPuzzle> comp = new Comparator<FifteenPuzzle>() {
         public int compare(FifteenPuzzle a, FifteenPuzzle b){
             //return (a.depth*1 + a.manhattan*1) - (b.depth*1 + b.manhattan*1);
@@ -70,8 +70,8 @@ public class main {
             //return (a.depth*60 + a.manhattan*a.manhattan) - (b.depth*60 + b.manhattan*b.manhattan);
         }
     };
-	
-	public static FifteenPuzzle[] buildArray(FifteenPuzzle start, FifteenPuzzle end,
+
+    public static FifteenPuzzle[] buildArray(FifteenPuzzle start, FifteenPuzzle end,
         PriorityQueue<FifteenPuzzle> openSet, HashMap<Long, FifteenPuzzle> closeSet, int depth, int sampleDeep){
         var sample = new FifteenPuzzle[1];
         sample[0] = end;
@@ -108,19 +108,20 @@ public class main {
         //int[][] startBoard = {{1, 10, 2, 4},{5, 11, 3, 7},{9, 0, 6, 8},{13, 14, 15, 12}}; //11 steps
         //int[][] startBoard = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9, 13, 14, 15}}; //43 steps
         //int[][] startBoard = {{14, 2, 15, 5},{7, 3, 0, 4},{1, 6, 10, 13},{12, 8, 9, 11}}; //49 steps
+        int[][] startBoard = {{7, 9, 11, 10},{4, 12, 14, 6},{2, 8, 13, 15},{0, 3, 5, 1}}; //59 steps
         //int[][] startBoard = {{11, 15, 8, 12},{14, 10, 13, 9},{2, 7, 4, 5},{3, 6, 1, 0}}; //64 steps
         //int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2, 6, 13, 5},{3, 7, 4, 1}}; //66 steps
         //int[][] startBoard = {{11, 15, 8, 12},{2, 14, 9, 13},{3, 10, 6, 5},{0, 7, 4, 1}}; //67 steps
         //int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3, 7, 4, 1}}; //69 steps
 
-        int[][] startBoard = {{14, 13, 15, 7},{11, 12, 9, 5},{6, 0, 2, 1},{4, 8, 10, 3}}; //57 steps
+        //int[][] startBoard = {{14, 13, 15, 7},{11, 12, 9, 5},{6, 0, 2, 1},{4, 8, 10, 3}}; //57 steps
         //int[][] startBoard = {{14, 10, 2, 1},{13, 9, 8, 0},{7, 3, 6, 11},{15, 5, 4, 12}}; //60 steps
         //int[][] startBoard = {{14, 10, 2, 1},{13, 9, 8, 11},{7, 3, 6, 12},{15, 5, 4, 0}}; //62 steps
-        
+
         var start = new FifteenPuzzle(startBoard);
         start.depth = 0;
-        //int[][] endBoard = {{1, 2, 3, 4},{5, 6, 7, 8},{9, 10, 11, 12},{13, 14, 15, 0}};
-        int[][] endBoard = {{0, 1, 2, 3},{4, 5, 6, 7},{8, 9, 10, 11},{12, 13, 14, 15}};
+        int[][] endBoard = {{1, 2, 3, 4},{5, 6, 7, 8},{9, 10, 11, 12},{13, 14, 15, 0}};
+        //int[][] endBoard = {{0, 1, 2, 3},{4, 5, 6, 7},{8, 9, 10, 11},{12, 13, 14, 15}};
         var end = new FifteenPuzzle(endBoard);
         end.depth = 0;
 
@@ -168,4 +169,5 @@ public class main {
         System.out.println("Used time: " + sysDate*0.001 + "s");
         System.out.println("Total Nodes: " + (openSet.size()+closeSet.size()+endCloseSet.size()+endOpenSet.size()));
     }
+
 }
