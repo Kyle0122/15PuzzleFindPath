@@ -1,12 +1,11 @@
 
 class SolverAStar {
-    
     val start: FifteenPuzzle
     val target: FifteenPuzzle
     
     var openSet: PriorityQueueS<FifteenPuzzle>
-    var closeSet: HashMap<ULong, FifteenPuzzle>
-    var targetSet: HashMap<ULong, FifteenPuzzle>
+    var closeSet: HashSetL<FifteenPuzzle>
+    var targetSet: HashSetL<FifteenPuzzle>
     var targetArray: List<FifteenPuzzle>
     
     constructor(
@@ -17,57 +16,48 @@ class SolverAStar {
         this.target = target
 
         val targetOpenSet = PriorityQueueS<FifteenPuzzle>()
-        targetSet = HashMap<ULong, FifteenPuzzle>()
+        targetSet = HashSetL<FifteenPuzzle>()
         targetArray = buildArray(target, start, targetOpenSet, targetSet,
                 start.heuristics / 4, Math.max(0, start.heuristics /4 - 3))
         
         openSet = PriorityQueueS<FifteenPuzzle>()
-        closeSet = HashMap<ULong, FifteenPuzzle>()
-        buildArray(start, target, openSet, closeSet, start.heuristics / 4, 0)
+        openSet.enqueue(start)
+        closeSet = HashSetL<FifteenPuzzle>()
+        buildArray(start, target, openSet, closeSet, start.heuristics / 2, 0)
     }
 
     fun searchClosest(maxdepth: Int): Array<FifteenPuzzle>? {
-        val current = openSet.dequeue()
-        if(current == null) {
-            println("No solution found!")
-            return null
-        }
-        
-        var children: Array<FifteenPuzzle>? = current.getChildrenGen2()
-        //var children: Array<FifteenPuzzle>? = current.getChildren()
-        if (children == null || current.heuristics <=2) {
-            children = current.getChildren()
-        }
+        val current = openSet.dequeue() ?: throw NoSuchElementException("No solution found!")
+        var children = current.getChildren()
         
         for (puzzle in children) {
-            val target_puzz = targetSet[puzzle.board]
+            val target_puzz = targetSet.findObject(puzzle)
+
             if (target_puzz != null) {
-                val ResultArray = arrayOf(puzzle, target_puzz)
-                return ResultArray
+                return arrayOf(puzzle, target_puzz)
             }
         }
 
-        val old = closeSet[current.board]
-        if (old == null) {
-            closeSet.put(current.board, current)
-        } else if (current.depth < old.depth) {
-            closeSet.put(current.board, current)
+        val old = closeSet.findObject(current)
+        if (old == null || current.depth < old.depth) {
+            closeSet.addOrUpdate(current)
         } else {
             return null
         }
         
-        var maxManhattanValue = maxdepth - current.depth - targetArray[0].depth
-        var childrenNumber = 0
-        for (i in 0 until children.size) {
+        val maxManhattanValue = maxdepth - current.depth - targetArray[0].depth
+
+        for (child in children) {
             for (puzz in targetArray) {
-                val a = children[i].getManhattan(puzz)
-                if (a < children[i].heuristics) {
-                    children[i].heuristics = a
+                val a = child.getManhattan(puzz)
+                
+                if (a < child.heuristics) {
+                    child.heuristics = a
                 }
             }
-            if (children[i].heuristics < maxManhattanValue) {
-                openSet.enqueue(children[i])
-                childrenNumber++
+
+            if (child.heuristics <= maxManhattanValue) {
+                openSet.enqueue(child)
             }
         }
 
@@ -78,7 +68,7 @@ class SolverAStar {
         start: FifteenPuzzle,
         end: FifteenPuzzle,
         openSet: PriorityQueueS<FifteenPuzzle>,
-        closeSet: HashMap<ULong, FifteenPuzzle>,
+        closeSet: HashSetL<FifteenPuzzle>,
         depth: Int,
         sampleDeep: Int
     ): List<FifteenPuzzle> {
@@ -88,24 +78,30 @@ class SolverAStar {
         var level = 1
         while (level <= depth) {
             val nextLevel = PriorityQueueS<FifteenPuzzle>()
+
             for (puzz in currentLevel) {
                 val children = puzz.getChildren()
-                for (i in 0 until children.size) {
-                    children[i].heuristics = children[i].getManhattan(end)
-                    if (!closeSet.containsKey(children[i].board)) {
-                        nextLevel.enqueue(children[i])
+
+                for (child in children) {
+                    child.heuristics = child.getManhattan(end)
+                    
+                    if (!closeSet.contains(child)) {
+                        nextLevel.enqueue(child)
                     }
                 }
-                closeSet.put(puzz.board, puzz)
+
+                closeSet.add(puzz)
             }
+            
             currentLevel = nextLevel
             if (level == sampleDeep) {
                 sample = currentLevel.toList()
             }
+
             level++
         }
         openSet.addAll(currentLevel)
         return sample
     }
-    
+
 }

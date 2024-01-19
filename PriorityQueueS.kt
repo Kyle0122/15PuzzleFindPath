@@ -94,7 +94,7 @@ class PriorityQueueS<T : Comparable<T>> : Iterable<T> {
         }
     }
 
-    private inline fun swap(i: Int, j: Int) {
+    private fun swap(i: Int, j: Int) {
         val temp = elements[i]
         elements[i] = elements[j]
         elements[j] = temp

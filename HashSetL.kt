@@ -1,12 +1,12 @@
 class HashSetL<T>: MutableSet<T> {
-    private val loadFactor = 3
+    private val loadFactor = 6
     private val initialCapacity = 100
     private var table: Array<MutableList<T>> = Array(initialCapacity) { mutableListOf() }
     private var sizeValue = 0
-    
+
     override val size: Int
         get() = sizeValue
-    
+
     override fun add(element: T): Boolean {
         if (needsResize()) {
             resize()
@@ -15,12 +15,34 @@ class HashSetL<T>: MutableSet<T> {
         val index = getIndex(element)
         val bucket = table[index]
 
-        if (!bucket.contains(element)) {
+        if (bucket.none { it == element }) {
             bucket.add(element)
             sizeValue++
             return true
         }
         return false
+    }
+    
+    fun addOrUpdate(element: T): Boolean {
+        if (needsResize()) {
+            resize()
+        }
+
+        val index = getIndex(element)
+        val bucket = table[index]
+
+        val indexOfElement = bucket.indexOfFirst { it == element }
+
+        if (indexOfElement != -1) {
+            // Update the existing element
+            bucket[indexOfElement] = element
+        } else {
+            // Add the new element
+            bucket.add(element)
+            sizeValue++
+        }
+
+        return true
     }
 
     override fun addAll(elements: Collection<T>): Boolean {
@@ -37,11 +59,11 @@ class HashSetL<T>: MutableSet<T> {
         table = Array(initialCapacity) { mutableListOf() }
         sizeValue = 0
     }
-    
+
     override fun contains(element: T): Boolean {
         val index = getIndex(element)
         val bucket = table[index]
-        return bucket.contains(element)
+        return bucket.any { it == element }
     }
 
     override fun containsAll(elements: Collection<T>): Boolean {
@@ -51,7 +73,7 @@ class HashSetL<T>: MutableSet<T> {
     override fun isEmpty(): Boolean {
         return sizeValue == 0
     }
-    
+
     override fun iterator(): MutableIterator<T> {
         return object : MutableIterator<T> {
             private var currentIndex = 0
@@ -77,28 +99,38 @@ class HashSetL<T>: MutableSet<T> {
             }
         }
     }
-    
+
     override fun remove(element: T): Boolean {
         val index = getIndex(element)
         val bucket = table[index]
-        if (bucket.contains(element)) {
-            bucket.remove(element)
+        
+        val indexOfElement = bucket.indexOfFirst { it == element }
+        
+        if (indexOfElement != -1) {
+            bucket.removeAt(indexOfElement)
             sizeValue--
             return true
         }
+        
         return false
     }
-    
+
     override fun retainAll(elements: Collection<T>): Boolean {
-        val iterator = iterator()
-        var modified = false
-        while (iterator.hasNext()) {
-            val element = iterator.next()
-            if (!elements.contains(element)) {
-                iterator.remove()
-                modified = true
+        val newTable = Array(table.size) { mutableListOf<T>() }
+
+        for (bucket in table) {
+            for (element in bucket) {
+                if (element in elements) {
+                    val newIndex = getIndex(element)
+                    newTable[newIndex].add(element)
+                }
             }
         }
+
+        table = newTable
+        val modified = sizeValue != newTable.sumOf { it.size }
+        sizeValue = newTable.sumOf { it.size }
+
         return modified
     }
 
@@ -126,7 +158,7 @@ class HashSetL<T>: MutableSet<T> {
         
         return standardDeviation
     }
-    
+
     fun findObject(goal: T): T? {
         val index = getIndex(goal)
         val bucket = table[index]
@@ -138,7 +170,7 @@ class HashSetL<T>: MutableSet<T> {
         }
         return null
     }
-    
+
     private fun getIndex(value: T): Int {
         val hashCode = value.hashCode() and Int.MAX_VALUE // Ensure non-negative hash code
         return hashCode % table.size
@@ -149,7 +181,7 @@ class HashSetL<T>: MutableSet<T> {
     }
 
     private fun resize() {
-        val newCapacity = table.size * 10
+        val newCapacity = table.size * 5
         val newTable = Array(newCapacity) { mutableListOf<T>() }
 
         for (bucket in table) {
