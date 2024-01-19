@@ -1,0 +1,102 @@
+java -Xms8g -Xmx16g -XX:+AlwaysPreTouch -XX:+UseParallelGC -jar mainkt.jar 66_file target_zero_last 
+start: 
+b 9 0 c 
+e f a 8 
+2 6 d 5 
+3 7 4 1 
+02     0
+
+start manhattan: 46
+start parity: 15
+end parity: 21
+parity check passed.
+Build Array level 0, size: 21592022
+sample length   464
+max Search depth: 23	close set size: 15118814	open set size: 21592021
+max Search depth: 24	close set size: 15118815	open set size: 21592021
+max Search depth: 25	close set size: 15118816	open set size: 21592022
+max Search depth: 26	close set size: 15118817	open set size: 21592024
+max Search depth: 27	close set size: 15118821	open set size: 21592030
+max Search depth: 28	close set size: 15118822	open set size: 21592031
+max Search depth: 29	close set size: 15118823	open set size: 21592031
+max Search depth: 30	close set size: 15118824	open set size: 21592032
+max Search depth: 31	close set size: 15118825	open set size: 21592033
+max Search depth: 32	close set size: 15118826	open set size: 21592035
+max Search depth: 33	close set size: 15118829	open set size: 21592040
+max Search depth: 34	close set size: 15118830	open set size: 21592041
+max Search depth: 35	close set size: 15119166	open set size: 21592396
+max Search depth: 36	close set size: 15119167	open set size: 21592398
+max Search depth: 37	close set size: 15119215	open set size: 21592448
+max Search depth: 38	close set size: 15119606	open set size: 21592838
+max Search depth: 39	close set size: 15121197	open set size: 21594522
+max Search depth: 40	close set size: 15121198	open set size: 21594523
+max Search depth: 41	close set size: 15134888	open set size: 21608506
+max Search depth: 42	close set size: 15134890	open set size: 21608508
+max Search depth: 43	close set size: 15134894	open set size: 21608511
+max Search depth: 44	close set size: 15134895	open set size: 21608513
+max Search depth: 45	close set size: 15134915	open set size: 21608539
+max Search depth: 46	close set size: 15134916	open set size: 21608540
+max Search depth: 47	close set size: 15135159	open set size: 21608795
+max Search depth: 48	close set size: 15135160	open set size: 21608797
+max Search depth: 49	close set size: 15444164	open set size: 21924194
+max Search depth: 50	close set size: 15444166	open set size: 21924195
+max Search depth: 51	close set size: 15444196	open set size: 21924221
+max Search depth: 52	close set size: 15444197	open set size: 21924222
+max Search depth: 53	close set size: 19768965	open set size: 26271320
+max Search depth: 54	close set size: 19768966	open set size: 26271321
+max Search depth: 55	close set size: 19768967	open set size: 26271322
+Found Solution in search depth: 56
+Total: 66 steps
+b 9 0 c  > b 9 c 0  > b 9 c 8  > b 9 c 8  > b 9 c 8  > b 9 c 8  > b 9 c 8 
+e f a 8  > e f a 8  > e f a 0  > e f a 5  > e f a 5  > e f a 5  > e f a 5 
+2 6 d 5  > 2 6 d 5  > 2 6 d 5  > 2 6 d 0  > 2 6 d 1  > 2 6 d 1  > 2 6 d 1 
+3 7 4 1  > 3 7 4 1  > 3 7 4 1  > 3 7 4 1  > 3 7 4 0  > 3 7 0 4  > 3 0 7 4 
+02     0 > 03     1 > 13     2 > 23     3 > 33     4 > 32     5 > 31     6
+b 9 c 8  > b 9 c 8  > b 9 c 8  > b 9 c 8  > b 9 c 8  > b 9 c 8  > b 9 c 8 
+e f a 5  > e 0 a 5  > 0 e a 5  > 2 e a 5  > 2 e a 5  > 2 e a 5  > 2 e a 5 
+2 0 d 1  > 2 f d 1  > 2 f d 1  > 0 f d 1  > 3 f d 1  > 3 f d 1  > 3 0 d 1 
+3 6 7 4  > 3 6 7 4  > 3 6 7 4  > 3 6 7 4  > 0 6 7 4  > 6 0 7 4  > 6 f 7 4 
+21     7 > 11     8 > 10     9 > 20    10 > 30    11 > 31    12 > 21    13
+b 9 c 8  > b 9 c 8  > b 9 c 8  > b 9 c 8  > b 9 c 8  > b 9 c 8  > b 9 c 8 
+2 e a 5  > 2 e a 5  > 2 e a 5  > 2 e a 5  > 2 e a 5  > 2 e a 5  > 2 0 a 5 
+3 d 0 1  > 3 d 1 0  > 3 d 1 4  > 3 d 1 4  > 3 d 1 4  > 3 0 1 4  > 3 e 1 4 
+6 f 7 4  > 6 f 7 4  > 6 f 7 0  > 6 f 0 7  > 6 0 f 7  > 6 d f 7  > 6 d f 7 
+22    14 > 23    15 > 33    16 > 32    17 > 31    18 > 21    19 > 11    20
+b 9 c 8  > 0 9 c 8  > 9 0 c 8  > 9 2 c 8  > 9 2 c 8  > 9 2 c 8  > 9 2 c 8 
+0 2 a 5  > b 2 a 5  > b 2 a 5  > b 0 a 5  > 0 b a 5  > 3 b a 5  > 3 b a 5 
+3 e 1 4  > 3 e 1 4  > 3 e 1 4  > 3 e 1 4  > 3 e 1 4  > 0 e 1 4  > 6 e 1 4 
+6 d f 7  > 6 d f 7  > 6 d f 7  > 6 d f 7  > 6 d f 7  > 6 d f 7  > 0 d f 7 
+10    21 > 00    22 > 01    23 > 11    24 > 10    25 > 20    26 > 30    27
+9 2 c 8  > 9 2 c 8  > 9 2 c 8  > 9 2 c 8  > 9 2 c 8  > 9 2 c 8  > 0 2 c 8 
+3 b a 5  > 3 b a 5  > 3 b a 5  > 3 b 0 5  > 3 0 b 5  > 0 3 b 5  > 9 3 b 5 
+6 e 1 4  > 6 0 1 4  > 6 1 0 4  > 6 1 a 4  > 6 1 a 4  > 6 1 a 4  > 6 1 a 4 
+d 0 f 7  > d e f 7  > d e f 7  > d e f 7  > d e f 7  > d e f 7  > d e f 7 
+31    28 > 21    29 > 22    30 > 12    31 > 11    32 > 10    33 > 00    34
+2 0 c 8  > 2 3 c 8  > 2 3 c 8  > 2 3 c 8  > 2 3 c 8  > 2 3 c 8  > 2 3 c 8 
+9 3 b 5  > 9 0 b 5  > 9 1 b 5  > 9 1 b 5  > 9 1 0 5  > 9 1 5 0  > 9 1 5 4 
+6 1 a 4  > 6 1 a 4  > 6 0 a 4  > 6 a 0 4  > 6 a b 4  > 6 a b 4  > 6 a b 0 
+d e f 7  > d e f 7  > d e f 7  > d e f 7  > d e f 7  > d e f 7  > d e f 7 
+01    35 > 11    36 > 21    37 > 22    38 > 12    39 > 13    40 > 23    41
+2 3 c 8  > 2 3 c 8  > 2 3 c 8  > 2 3 c 8  > 2 3 c 8  > 2 3 c 8  > 2 3 c 8 
+9 1 5 4  > 9 1 5 4  > 9 1 5 4  > 9 1 5 4  > 9 1 5 4  > 0 1 5 4  > 1 0 5 4 
+6 a b 7  > 6 a b 7  > 6 a 0 7  > 6 0 a 7  > 0 6 a 7  > 9 6 a 7  > 9 6 a 7 
+d e f 0  > d e 0 f  > d e b f  > d e b f  > d e b f  > d e b f  > d e b f 
+33    42 > 32    43 > 22    44 > 21    45 > 20    46 > 10    47 > 11    48
+2 3 c 8  > 2 3 0 8  > 2 3 8 0  > 2 3 8 4  > 2 3 8 4  > 2 3 0 4  > 2 0 3 4 
+1 5 0 4  > 1 5 c 4  > 1 5 c 4  > 1 5 c 0  > 1 5 0 c  > 1 5 8 c  > 1 5 8 c 
+9 6 a 7  > 9 6 a 7  > 9 6 a 7  > 9 6 a 7  > 9 6 a 7  > 9 6 a 7  > 9 6 a 7 
+d e b f  > d e b f  > d e b f  > d e b f  > d e b f  > d e b f  > d e b f 
+12    49 > 02    50 > 03    51 > 13    52 > 12    53 > 02    54 > 01    55
+0 2 3 4  > 0 2 3 4  > 1 2 3 4  > 1 2 3 4  > 1 2 3 4  > 1 2 3 4  > 1 2 3 4 
+1 5 8 c  > 1 5 8 c  > 0 5 8 c  > 5 0 8 c  > 5 6 8 c  > 5 6 8 c  > 5 6 8 c 
+9 6 a 7  > 9 6 a 7  > 9 6 a 7  > 9 6 a 7  > 9 0 a 7  > 9 a 0 7  > 9 a 7 0 
+d e b f  > d e b f  > d e b f  > d e b f  > d e b f  > d e b f  > d e b f 
+00    56 > 00    10 > 10     9 > 11     8 > 21     7 > 22     6 > 23     5
+1 2 3 4  > 1 2 3 4  > 1 2 3 4  > 1 2 3 4  > 1 2 3 4 
+5 6 8 0  > 5 6 0 8  > 5 6 7 8  > 5 6 7 8  > 5 6 7 8 
+9 a 7 c  > 9 a 7 c  > 9 a 0 c  > 9 a b c  > 9 a b c 
+d e b f  > d e b f  > d e b f  > d e 0 f  > d e f 0 
+13     4 > 12     3 > 22     2 > 32     1 > 33     0
+
+Used time: 126.679s
+Total Nodes: 46044705

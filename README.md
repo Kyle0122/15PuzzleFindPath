@@ -8,7 +8,7 @@ The code was originally written in java and later translated to Kotlin. The Kotl
 ```console
 $ kotlinc main.kt FifteenPuzzle.kt -include-runtime -d mainkt.jar
 
-$ java -jar -Xms8g mainkt.jar
+$ java -jar -Xmx16g -XX:+AlwaysPreTouch -XX:+UseParallelGC mainkt.jar <input_file> <target_file>
 ```
 
 java version: 
@@ -16,11 +16,7 @@ java version:
 ```console
 $ javac FifteenPuzzle.java main.java
 
-$ java -XX:+UnlockExperimentalVMOptions -Xms8g -XX:+AlwaysPreTouch main
-
-or
-
-$ java -XX:+UseParallelGC -Xmx16g main
+$ java -Xmx16g -XX:+AlwaysPreTouch -XX:+UseParallelGC main
 ```
 
 You can use more RAM if your puzzle is too hard to solve.

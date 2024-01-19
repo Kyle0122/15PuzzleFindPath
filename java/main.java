@@ -64,8 +64,8 @@ public class main {
 
     static Comparator<FifteenPuzzle> comp = new Comparator<FifteenPuzzle>() {
         public int compare(FifteenPuzzle a, FifteenPuzzle b){
-            //return (a.depth*1 + a.manhattan*1) - (b.depth*1 + b.manhattan*1);
-            return (a.depth*9 + a.manhattan*9 + a.getParity()) - (b.depth*9 + b.manhattan*9 + b.getParity());
+            return (a.depth*1 + a.manhattan*1) - (b.depth*1 + b.manhattan*1);
+            //return (a.depth*9 + a.manhattan*9 + a.getParity()) - (b.depth*9 + b.manhattan*9 + b.getParity());
             //return (a.depth*9 + a.manhattan*10) - (b.depth*9 + b.manhattan*10);
             //return (a.depth*60 + a.manhattan*a.manhattan) - (b.depth*60 + b.manhattan*b.manhattan);
         }
@@ -108,8 +108,8 @@ public class main {
         //int[][] startBoard = {{1, 10, 2, 4},{5, 11, 3, 7},{9, 0, 6, 8},{13, 14, 15, 12}}; //11 steps
         //int[][] startBoard = {{10, 6, 12, 11},{8, 7, 0, 4},{5, 2, 3, 1},{9, 13, 14, 15}}; //43 steps
         //int[][] startBoard = {{14, 2, 15, 5},{7, 3, 0, 4},{1, 6, 10, 13},{12, 8, 9, 11}}; //49 steps
-        int[][] startBoard = {{7, 9, 11, 10},{4, 12, 14, 6},{2, 8, 13, 15},{0, 3, 5, 1}}; //59 steps
-        //int[][] startBoard = {{11, 15, 8, 12},{14, 10, 13, 9},{2, 7, 4, 5},{3, 6, 1, 0}}; //64 steps
+        //int[][] startBoard = {{7, 9, 11, 10},{4, 12, 14, 6},{2, 8, 13, 15},{0, 3, 5, 1}}; //59 steps
+        int[][] startBoard = {{11, 15, 8, 12},{14, 10, 13, 9},{2, 7, 4, 5},{3, 6, 1, 0}}; //64 steps
         //int[][] startBoard = {{11, 9, 0, 12},{14, 15, 10, 8},{2, 6, 13, 5},{3, 7, 4, 1}}; //66 steps
         //int[][] startBoard = {{11, 15, 8, 12},{2, 14, 9, 13},{3, 10, 6, 5},{0, 7, 4, 1}}; //67 steps
         //int[][] startBoard = {{11, 15, 9, 12},{14, 10, 8, 13},{6, 2, 5, 0},{3, 7, 4, 1}}; //69 steps
