@@ -60,7 +60,7 @@ class FifteenPuzzle : Comparable<FifteenPuzzle> {
 	
     fun gety(): Int = this.y.toInt()
 
-    fun getManhattan(target: FifteenPuzzle): Byte {
+    fun getManhattan(target: FifteenPuzzle): Int {
         var manhattan = 0
         val targetBoardX = IntArray(16)
         val targetBoardY = IntArray(16)
@@ -80,7 +80,7 @@ class FifteenPuzzle : Comparable<FifteenPuzzle> {
                 manhattan += Math.abs(yy - j) + Math.abs(xx - i)
             }
         }
-        return manhattan.toByte()
+        return manhattan
     }
 
     fun getParity(): Byte {

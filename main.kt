@@ -30,8 +30,8 @@ fun main(args: Array<String>) {
         .toTypedArray()
     val end = FifteenPuzzle(endBoard)
     
-    start.heuristics = start.getManhattan(end)
-    end.heuristics = end.getManhattan(start)
+    start.heuristics = start.getManhattan(end).toByte()
+    end.heuristics = end.getManhattan(start).toByte()
     println("start: \n${start}")
     println("start manhattan: " + start.heuristics)
     println("start parity: " + start.getParity())
@@ -46,12 +46,8 @@ fun main(args: Array<String>) {
         return
     }
     
-    val solver = SolverAStar(start, end)
-    val currentPuzzle = solver.openSet.peek()
-    if (currentPuzzle != null) {
-        println("Build Array level ${currentPuzzle.depth}, size: ${solver.openSet.size()}")
-        println("sample length   ${solver.targetArray.size}")
-    }
+    val solver = SolverAStar(start, end, 72)
+    println("sample length   ${solver.targetArray.size}")
     
     // record starting time
     val sysDate = System.currentTimeMillis()
@@ -60,7 +56,7 @@ fun main(args: Array<String>) {
     var ResultArray: Array<FifteenPuzzle>? = null
     
     while (ResultArray == null) {
-		ResultArray = solver.searchClosest(72)
+		ResultArray = solver.searchClosest()
         val currentState = solver.openSet.peek()
         if (currentState != null && currentState.depth > depth_Max) {
             print("max Search depth: ${currentState.depth}")

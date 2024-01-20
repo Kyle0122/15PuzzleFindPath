@@ -36,13 +36,13 @@ class HashSetL<T>: MutableSet<T> {
         if (indexOfElement != -1) {
             // Update the existing element
             bucket[indexOfElement] = element
+            return false // Element updated, return false
         } else {
             // Add the new element
             bucket.add(element)
             sizeValue++
+            return true // Element added, return true
         }
-
-        return true
     }
 
     override fun addAll(elements: Collection<T>): Boolean {
