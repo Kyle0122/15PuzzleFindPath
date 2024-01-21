@@ -1,9 +1,5 @@
 
 class FifteenPuzzle : Comparable<FifteenPuzzle> {
-	companion object {
-        const val BOARDLENGTH: Int = 4
-    }
-    
     var board: ULong = 0UL
     var parent: FifteenPuzzle = this
     var x: Byte = 1
@@ -12,8 +8,8 @@ class FifteenPuzzle : Comparable<FifteenPuzzle> {
     var depth: Byte = 0
 
     constructor(board: Array<IntArray>) {
-        for (i in 0 until BOARDLENGTH) {
-            for (j in 0 until BOARDLENGTH) {
+        for (i in 0 until 4) {
+            for (j in 0 until 4) {
                 if (board[i][j] == 0 || board[i][j] == 16) {
                     x = i.toByte()
                     y = j.toByte()
@@ -23,9 +19,20 @@ class FifteenPuzzle : Comparable<FifteenPuzzle> {
             }
         }
     }
-
-    constructor(board: Array<IntArray>, parent: FifteenPuzzle) : this(board) {
-        this.parent = parent
+    
+    constructor(board: IntArray) {
+        var index = 0
+        for (i in 0 until 4) {
+            for (j in 0 until 4) {
+                if (board[index] == 0 || board[index] == 16) {
+                    x = i.toByte()
+                    y = j.toByte()
+                } else {
+                    setval(i, j, board[index].toByte())
+                }
+                index++
+            }
+        }
     }
 
     constructor(board: Array<IntArray>, depth: Int) : this(board) {
@@ -40,6 +47,11 @@ class FifteenPuzzle : Comparable<FifteenPuzzle> {
         this.y = original.y
         this.heuristics = 127.toByte()
         this.depth = original.depth
+    }
+    
+    constructor(parent: FifteenPuzzle, depth: Int) : this(parent) {
+        this.parent = parent
+        this.depth = depth.toByte()
     }
 
     fun setval(x: Int, y: Int, value: Byte) {
@@ -60,37 +72,14 @@ class FifteenPuzzle : Comparable<FifteenPuzzle> {
 	
     fun gety(): Int = this.y.toInt()
 
-    fun getManhattan(target: FifteenPuzzle): Int {
-        var manhattan = 0
-        val targetBoardX = IntArray(16)
-        val targetBoardY = IntArray(16)
-        for (i in 0 until BOARDLENGTH) {
-            for (j in 0 until BOARDLENGTH) {
-                val index = target.getval(i, j)
-                targetBoardX[index] = i
-                targetBoardY[index] = j
-            }
-        }
-        for (i in 0 until BOARDLENGTH) {
-            for (j in 0 until BOARDLENGTH) {
-                val index = getval(i, j)
-                if (index == 0) continue
-                val xx = targetBoardX[index]
-                val yy = targetBoardY[index]
-                manhattan += Math.abs(yy - j) + Math.abs(xx - i)
-            }
-        }
-        return manhattan
-    }
-
     fun getParity(): Byte {
         var parity: Byte = 0
         // valueN stores the position(0 to 15) of the tile
         val valueN = IntArray(16)
         // boardN stores the tile in each position
         val boardN = IntArray(16)
-        for (i in 0 until BOARDLENGTH) {
-            for (j in 0 until BOARDLENGTH) {
+        for (i in 0 until 4) {
+            for (j in 0 until 4) {
                 boardN[4 * i + j] = getval(i, j)
                 valueN[getval(i, j)] = 4 * i + j
                 if (getval(i, j) == 0) {
@@ -151,7 +140,7 @@ class FifteenPuzzle : Comparable<FifteenPuzzle> {
             children[index].depth = (this.depth + 1).toByte()
             index++
         }
-        if (getx() != BOARDLENGTH - 1 && parent.getx() != x + 1) {
+        if (getx() != 4 - 1 && parent.getx() != x + 1) {
             children[index].moveZero(1, 0)
             children[index].depth = (this.depth + 1).toByte()
             index++
@@ -161,7 +150,7 @@ class FifteenPuzzle : Comparable<FifteenPuzzle> {
             children[index].depth = (this.depth + 1).toByte()
             index++
         }
-        if (gety() != BOARDLENGTH - 1 && parent.gety() != y + 1) {
+        if (gety() != 4 - 1 && parent.gety() != y + 1) {
             children[index].moveZero(0, 1)
             children[index].depth = (this.depth + 1).toByte()
             index++
@@ -344,8 +333,8 @@ class FifteenPuzzle : Comparable<FifteenPuzzle> {
 
     override fun toString(): String {
         var ans = ""
-        for (i in 0 until BOARDLENGTH) {
-            for (j in 0 until BOARDLENGTH) {
+        for (i in 0 until 4) {
+            for (j in 0 until 4) {
                 ans += String.format("%x ", getval(i, j))
             }
             ans += "\n"

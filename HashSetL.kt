@@ -1,5 +1,5 @@
 class HashSetL<T>: MutableSet<T> {
-    private val loadFactor = 6
+    private val loadFactor = 7
     private val initialCapacity = 100
     private var table: Array<MutableList<T>> = Array(initialCapacity) { mutableListOf() }
     private var sizeValue = 0

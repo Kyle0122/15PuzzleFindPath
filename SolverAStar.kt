@@ -44,11 +44,6 @@ class SolverAStar {
 
         // find in the closeSet if there are already a current object.
         // only find in depth lower than current depth
-        /*var old: FifteenPuzzle? = null
-        for (depth in 0 until current.depth) {
-            old = closeSet[depth].findObject(current)
-            if (old != null) { break }
-        }*/
         val old = closeSet.findObject(current)
         
         if (old == null || current.depth < old.depth) {
@@ -57,9 +52,7 @@ class SolverAStar {
             return null
         }
 
-        val maxManhattanValue = maxDepth - current.depth - targetArray[0].depth
-
-        if(current.depth <= start.heuristics / 2) {
+        /*if(current.depth < start.heuristics - targetArray[0].depth) {
 
             for (child in children) {
                 val a = child.getManhattan(target)
@@ -67,24 +60,69 @@ class SolverAStar {
                 openSet.enqueue(child)
             }
             
-        } else {
+        } else {*/
             
-            for (child in children) {
-                for (puzz in targetArray) {
-                    val a = child.getManhattan(puzz)
-                    
-                    if (a < child.heuristics) {
-                        child.heuristics = a.toByte()
-                    }
-                }
-
-                if (child.heuristics <= maxManhattanValue) {
-                    openSet.enqueue(child)
+        val maxManhattanValue = maxDepth - current.depth
+        for (child in children) {
+            for (puzz in targetArray) {
+                val a = child.getManhattan(puzz) + puzz.depth
+                if (a < child.heuristics) {
+                    child.heuristics = a.toByte()
                 }
             }
-            
+
+            if (child.heuristics <= maxManhattanValue) {
+                openSet.enqueue(child)
+            }
         }
         return null
+    }
+
+    fun getManhattan(puzzle: FifteenPuzzle, target: FifteenPuzzle): Int {
+        var manhattan = 0
+        val targetBoardX = IntArray(16)
+        val targetBoardY = IntArray(16)
+        for (i in 0 until 4) {
+            for (j in 0 until 4) {
+                val index = target.getval(i, j)
+                targetBoardX[index] = i
+                targetBoardY[index] = j
+            }
+        }
+        for (i in 0 until 4) {
+            for (j in 0 until 4) {
+                val index = puzzle.getval(i, j)
+                if (index == 0) continue
+                val xx = targetBoardX[index]
+                val yy = targetBoardY[index]
+                manhattan += Math.abs(yy - j) + Math.abs(xx - i)
+            }
+        }
+        return manhattan
+    }
+
+    fun getLinearConflict(puzzle: FifteenPuzzle, target: FifteenPuzzle): Int {
+        val targetBoardX = IntArray(16)
+        val targetBoardY = IntArray(16)
+        for (i in 0 until 4) {
+            for (j in 0 until 4) {
+                val index = puzzle.getval(i, j)
+                targetBoardX[index] = i
+                targetBoardY[index] = j
+            }
+        }
+        for (i in 0 until 4) {
+            for (j in 0 until 4) {
+                val value = target.getval(i, j)
+                if (targetBoardX[value] == i && targetBoardY[value] == j) {
+                    continue
+                }
+                if (targetBoardX[value] == i) {
+                    
+                }
+            }
+        }
+        
     }
 
     fun buildArray(
@@ -101,26 +139,20 @@ class SolverAStar {
         var level = 1
         while (level <= depth) {
             val nextLevel = PriorityQueueS<FifteenPuzzle>()
-
             for (puzz in currentLevel) {
                 val children = puzz.getChildren()
-
                 for (child in children) {
                     child.heuristics = child.getManhattan(end).toByte()
-                    
                     if (!closeSet.contains(child)) {
                         nextLevel.enqueue(child)
                     }
                 }
-
                 closeSet.add(puzz)
             }
-            
             currentLevel = nextLevel
             if (level == sampleDeep) {
                 sample = currentLevel.toList()
             }
-
             level++
         }
         openSet.addAll(currentLevel)
