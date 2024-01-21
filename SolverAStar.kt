@@ -18,6 +18,7 @@ class SolverAStar {
         this.target = target
         this.maxDepth = maxDepth
 
+        start.heuristics = getManhattan(start, target).toByte()
         val targetOpenSet = PriorityQueueS<FifteenPuzzle>()
         targetSet = HashSetL<FifteenPuzzle>()
         targetArray = buildArray(target, start, targetOpenSet, targetSet,
@@ -65,7 +66,7 @@ class SolverAStar {
         val maxManhattanValue = maxDepth - current.depth
         for (child in children) {
             for (puzz in targetArray) {
-                val a = child.getManhattan(puzz) + puzz.depth
+                val a = getManhattan(child, puzz) + puzz.depth
                 if (a < child.heuristics) {
                     child.heuristics = a.toByte()
                 }
@@ -117,23 +118,20 @@ class SolverAStar {
                 if (targetBoardX[value] == i && targetBoardY[value] == j) {
                     continue
                 }
-                if (targetBoardX[value] == i) {
-                    
-                }
             }
         }
-        
+        return 0
     }
 
     fun buildArray(
         start: FifteenPuzzle,
-        end: FifteenPuzzle,
+        target: FifteenPuzzle,
         openSet: PriorityQueueS<FifteenPuzzle>,
         closeSet: HashSetL<FifteenPuzzle>,
         depth: Int,
         sampleDeep: Int
     ): List<FifteenPuzzle> {
-        var sample: List<FifteenPuzzle> = listOf(end)
+        var sample: List<FifteenPuzzle> = listOf(target)
         var currentLevel = PriorityQueueS<FifteenPuzzle>()
         currentLevel.enqueue(start)
         var level = 1
@@ -142,7 +140,7 @@ class SolverAStar {
             for (puzz in currentLevel) {
                 val children = puzz.getChildren()
                 for (child in children) {
-                    child.heuristics = child.getManhattan(end).toByte()
+                    child.heuristics = getManhattan(child, target).toByte()
                     if (!closeSet.contains(child)) {
                         nextLevel.enqueue(child)
                     }

@@ -57,7 +57,6 @@ fun main(args: Array<String>) {
                 // This line is a test case
                 val startBoard = numbers.take(16).toIntArray()
                 val start = FifteenPuzzle(startBoard)
-                start.heuristics = start.getManhattan(end).toByte()
 
                 // Add your solving logic here using 'start' and 'end'
                 val solver = SolverAStar(start, end, 72)
@@ -87,7 +86,6 @@ fun main(args: Array<String>) {
             .toTypedArray()
         val end = FifteenPuzzle(endBoard)
         
-        start.heuristics = start.getManhattan(end).toByte()
         println("start: \n${start}")
         println("start manhattan: " + start.heuristics)
         println("start parity: " + start.getParity())
